@@ -1,8 +1,9 @@
 <?php
-// config /etc/sudoers.d/010_wwwdata
+// config /etc/sudoers.d/010_wwwdata-nopasswd
 //
 // www-data ALL = NOPASSWD: /sbin/shutdown
 // www-data ALL = NOPASSWD: /bin/mount
+// www-data ALL = NOPASSWD: /bin/date
 //
 
 $responseArray = Array();
@@ -17,9 +18,11 @@ if( !empty( $_POST )){
     case 'reboot':
         $response = exec('sudo /sbin/shutdown -r', $returnVal);
         break;
-    case 'mount';
+    case 'mount':
         $response = exec('sudo mount', $returnVal);
         break;
+    case 'syncTime':
+        $response = exec("sudo date -s '" . $_POST['timestamp'] . "'", $returnVal );
     default:
         $response = '(!action)';
         break;
@@ -113,6 +116,7 @@ if( !empty( $_POST )){
                     <button type="submit" value="poweroff">Power Off</button>
                     <button type="submit" value="reboot">Reboot</button>
                     <button type="submit" value="mount" >Mount</button>
+                    <button type="submit" value="syncTime" >SyncTime</button>
                 </div>
             </div>
             <div class="row">
@@ -146,6 +150,9 @@ if( !empty( $_POST )){
                 };
 
                 formData.append("action", this.value );
+                if( this.value == 'syncTime' ){
+                    formData.append('timestamp', Date());
+                }
                 xhr.open("POST", '/panel.php', true);
                 xhr.send(formData);
 
